@@ -22,9 +22,7 @@ public class ProceduralTerrain : MonoBehaviour
         if (chunkGenerator != null && pathGenerator != null)
         {
             chunkGenerator.GenerateChunks();
-
-            StartCoroutine(pathGenerator.GeneratePath(new Vector3(chunkGenerator.chunkWidth / 2, 0, chunkGenerator.chunkLength / 2), chunkGenerator.numberOfChunks));
-
+            pathGenerator.RemoveOverlappingTerrainCubes();
         }
     }
 }
