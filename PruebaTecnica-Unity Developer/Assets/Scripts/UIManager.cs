@@ -74,6 +74,9 @@ public class UIManager : MonoBehaviour
         // Limpiar todos los objetos generados previamente
         proceduralTerrain.ClearAllGeneratedObjects();
 
+        //Eliminar PathParent
+        GameObject pathParent = GameObject.Find("PathParent");
+        
         // Regenerar el terreno y el camino
         proceduralTerrain.GenerateTerrain();
     }

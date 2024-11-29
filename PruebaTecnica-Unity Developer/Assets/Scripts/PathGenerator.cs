@@ -53,30 +53,31 @@ public class PathGenerator : MonoBehaviour
 
         // Si la irregularidad es 0, el camino será muy recto
         // Si la irregularidad es 1, el camino será muy irregular
-        if (moveProbability < irregularity)
-        {
-            // Moverse en la dirección menos corta (más irregular)
-            if (Mathf.Abs(target.x - currentPosition.x) <= Mathf.Abs(target.z - currentPosition.z))
+
+            if (moveProbability < irregularity)
             {
-                currentPosition.x += Mathf.Sign(target.x - currentPosition.x);
+                // Moverse en la dirección menos corta (más irregular)
+                if (Mathf.Abs(target.x - currentPosition.x) <= Mathf.Abs(target.z - currentPosition.z))
+                {
+                    currentPosition.x += Mathf.Sign(target.x - currentPosition.x);
+                }
+                else
+                {
+                    currentPosition.z += Mathf.Sign(target.z - currentPosition.z);
+                }
             }
             else
             {
-                currentPosition.z += Mathf.Sign(target.z - currentPosition.z);
+                // Moverse en la dirección más corta (más regular)
+                if (Mathf.Abs(target.x - currentPosition.x) > Mathf.Abs(target.z - currentPosition.z))
+                {
+                    currentPosition.x += Mathf.Sign(target.x - currentPosition.x);
+                }
+                else
+                {
+                    currentPosition.z += Mathf.Sign(target.z - currentPosition.z);
+                }
             }
-        }
-        else
-        {
-            // Moverse en la dirección más corta (más regular)
-            if (Mathf.Abs(target.x - currentPosition.x) > Mathf.Abs(target.z - currentPosition.z))
-            {
-                currentPosition.x += Mathf.Sign(target.x - currentPosition.x);
-            }
-            else
-            {
-                currentPosition.z += Mathf.Sign(target.z - currentPosition.z);
-            }
-        }
 
         return currentPosition;
     }
@@ -142,6 +143,7 @@ public class PathGenerator : MonoBehaviour
 
             for (int j = 0; j < steps; j++)
             {
+                Debug.Log("Current position: " + currentPosition + "chunkCenter: " + chunkCenter);
                 currentPosition = MoveTowards(currentPosition, chunkCenter, currentIrregularity, currentExpansionFactor);
                 CreatePathCube(currentPosition);
             }
