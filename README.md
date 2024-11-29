@@ -1,6 +1,6 @@
 # PruebaTecnica-Unity-Developer
 
-Para iniciar la aplicacion ir a la carpeta App, ahí está el ejecutable.
+Para iniciar la aplicacion se debe descargar la carpeta App, dentro habrá un ejecutable.
 
 1. Creación del Cube
   - Primero de todo se tiene que crear un cube con un transform.scale de 1x1x1.
