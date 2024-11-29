@@ -1,5 +1,7 @@
 # PruebaTecnica-Unity-Developer
 
+Para iniciar la aplicacion ir a la carpeta builds, ahí está el ejecutable.
+
 1. Creación del Cube
 
 Primero de todo se tiene que crear un cube con un transform.scale de 1x1x1.
@@ -157,28 +159,27 @@ El UIManager es un script que gestiona la interfaz de usuario (UI) en tu aplicac
 Responsabilidades del UIManager:
 
 Interacción con la UI:
-
 Campos de entrada (TMP_InputField): Permiten al usuario ingresar valores numéricos para el número de chunks, el ancho de los chunks y la longitud de los chunks.
 Sliders (Slider): Permiten al usuario ajustar el movimiento desde el centro y la irregularidad del camino.
 Botón (Button): Permite al usuario aplicar los cambios ingresados y regenerar la escena.
+
 Actualización de la UI:
-
 Textos (TMP_Text): Muestran los valores actuales de los sliders para que el usuario pueda ver los ajustes en tiempo real.
-Comunicación con otros componentes:
 
+Comunicación con otros componentes:
 Generadores (PruebaChunkGenerator, PruebaPathGenerator, ProceduralTerrain): El UIManager actualiza estos componentes con los nuevos valores ingresados por el usuario y les indica que regeneren la escena.
 Funcionalidades del UIManager
+
 Inicialización:
-
 En el método Start(), se asignan listeners a los botones y sliders para que llamen a métodos específicos cuando se interactúa con ellos.
+
 Actualización de la UI en tiempo real:
-
 En el método Update(), se actualizan los textos de los sliders en cada frame para reflejar sus valores actuales.
-Aplicación de cambios:
 
+Aplicación de cambios:
 En el método OnApplyButtonClicked(), se convierten los valores de los campos de entrada a enteros y se asignan al generador de chunks.
 Se obtienen los valores de los sliders y se asignan al generador de caminos.
 Se limpian todos los objetos generados previamente y se regenera el terreno y el camino.
-Actualización de textos de sliders:
 
+Actualización de textos de sliders:
 Los métodos UpdateExpansionFactor(float value) y UpdateIrregularity(float value) actualizan los textos del factor de expansión y la irregularidad con los valores de los sliders.
