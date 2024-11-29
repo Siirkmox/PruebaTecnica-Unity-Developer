@@ -1,6 +1,6 @@
 # PruebaTecnica-Unity-Developer
 
-Para iniciar la aplicacion ir a la carpeta builds, ahí está el ejecutable.
+Para iniciar la aplicacion ir a la carpeta App, ahí está el ejecutable.
 
 1. Creación del Cube
 
