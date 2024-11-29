@@ -2161,7 +2161,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   chunkGenerator: {fileID: 1168309551}
-  padding: 10
+  padding: 20
 --- !u!1 &1080368540
 GameObject:
   m_ObjectHideFlags: 0

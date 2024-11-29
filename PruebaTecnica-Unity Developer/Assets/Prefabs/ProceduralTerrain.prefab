@@ -1,5 +1,36 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &3265254399951093706
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3424880915029473588}
+  m_Layer: 0
+  m_Name: PathParent
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3424880915029473588
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3265254399951093706}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6178947450928628764}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &6590437459897517662
 GameObject:
   m_ObjectHideFlags: 0
@@ -32,7 +63,8 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 3424880915029473588}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &5567254462802792560
@@ -47,7 +79,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 64098860f7c130c48bf9ecb22c04aa8a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  seed: 0
   chunkGenerator: {fileID: 4014705028869281592}
   pathGenerator: {fileID: -686335551414823454}
 --- !u!114 &4014705028869281592
@@ -65,11 +96,14 @@ MonoBehaviour:
   chunkPrefab: {fileID: 4879606951502890914, guid: 229d62849c92e644cb33b08cd3ab4700, type: 3}
   chunkWidth: 13
   chunkLength: 13
+  chunkHeight: 2
   numberOfChunks: 10
+  chunkCounter: 1
   chunkPositions: []
   chunksList: []
   cubePrefab: {fileID: 7396645145964747116, guid: d65d87747adfeb74bbe33199245a2447, type: 3}
   terrainCubesList: []
+  terrainCounter: 1
 --- !u!114 &-686335551414823454
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -109,3 +143,6 @@ MonoBehaviour:
   movementFromCenterSlider: {fileID: 0}
   irregularitySlider: {fileID: 0}
   restartButton: {fileID: 0}
+  exitButton: {fileID: 0}
+  expansionFactorText: {fileID: 0}
+  irregularityText: {fileID: 0}

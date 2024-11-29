@@ -25,10 +25,6 @@ public class ChunkGenerator : MonoBehaviour
         chunkPositions.Clear(); // Limpiar la lista de posiciones de chunks
         chunksList.Clear(); // Limpiar la lista de chunks generados
         chunkCounter = 1; // Reiniciar el contador de chunks
-
-        // Crear un objeto padre para los caminos
-        GameObject pathParent = new GameObject("PathParent");
-        pathParent.transform.parent = this.transform;
         
         Vector3 currentPosition = new Vector3(0, 0, 0); // Posición inicial del primer chunk
         chunkPositions.Add(currentPosition); // Añadir la posición inicial a la lista
