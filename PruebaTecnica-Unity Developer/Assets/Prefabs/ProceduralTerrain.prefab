@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 5567254462802792560}
   - component: {fileID: 4014705028869281592}
   - component: {fileID: -686335551414823454}
+  - component: {fileID: -7229977084370216883}
   m_Layer: 0
   m_Name: ProceduralTerrain
   m_TagString: Untagged
@@ -66,8 +67,9 @@ MonoBehaviour:
   chunkLength: 13
   numberOfChunks: 10
   chunkPositions: []
+  chunksList: []
   cubePrefab: {fileID: 7396645145964747116, guid: d65d87747adfeb74bbe33199245a2447, type: 3}
-  pathGenerator: {fileID: -686335551414823454}
+  terrainCubesList: []
 --- !u!114 &-686335551414823454
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -82,6 +84,28 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   pathCubePrefab: {fileID: 7396645145964747116, guid: d65d87747adfeb74bbe33199245a2447, type: 3}
   chunkGenerator: {fileID: 4014705028869281592}
+  pathCubesList: []
   pathCounter: 1
   irregularity: 1
   expansionFactor: 0
+--- !u!114 &-7229977084370216883
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6590437459897517662}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7f12a7e5fbc336248a35645c160518be, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  chunkGenerator: {fileID: 4014705028869281592}
+  pathGenerator: {fileID: -686335551414823454}
+  proceduralTerrain: {fileID: 5567254462802792560}
+  numberOfChunksInput: {fileID: 0}
+  chunkWidthInput: {fileID: 0}
+  chunkLengthInput: {fileID: 0}
+  movementFromCenterSlider: {fileID: 0}
+  irregularitySlider: {fileID: 0}
+  restartButton: {fileID: 0}
