@@ -47,15 +47,58 @@ public class PathGenerator : MonoBehaviour
         }
     }
 
-    // Mueve la posición actual hacia el objetivo con cierta irregularidad y expansión
+// Mueve la posición actual hacia el objetivo con cierta irregularidad y expansión
     private Vector3 MoveTowards(Vector3 currentPosition, Vector3 target, float irregularity, float expansionFactor)
     {
-            // Calcular la dirección hacia el objetivo
-            Vector3 direction = (target - currentPosition).normalized;
+        // Calcular la probabilidad de moverse en una dirección u otra
+        float moveProbability = Random.Range(0f, 1f);
 
-            // Calcular la posición objetivo
-            currentPosition += direction;
-            
+        // Si la irregularidad es 0, el camino será muy recto
+        // Si la irregularidad es 1, el camino será muy irregular
+        if (moveProbability < irregularity)
+        {
+            // Moverse en la dirección menos corta (más irregular)
+            if (Mathf.Abs(target.x - currentPosition.x) <= Mathf.Abs(target.z - currentPosition.z))
+            {
+                currentPosition.x += Mathf.Sign(target.x - currentPosition.x);
+            }
+            else
+            {
+                currentPosition.z += Mathf.Sign(target.z - currentPosition.z);
+            }
+        }
+        else
+        {
+            // Moverse en la dirección más corta (más regular)
+            if (Mathf.Abs(target.x - currentPosition.x) > Mathf.Abs(target.z - currentPosition.z))
+            {
+                currentPosition.x += Mathf.Sign(target.x - currentPosition.x);
+            }
+            else
+            {
+                currentPosition.z += Mathf.Sign(target.z - currentPosition.z);
+            }
+        }
+
+         // Aplicar el factor de expansión
+        if (Random.Range(0f, 1f) < expansionFactor)
+        {
+            // Moverse hacia los bordes del chunk
+            if (Random.Range(0f, 1f) < 0.5f)
+            {
+                currentPosition.x += Mathf.Sign(Random.Range(-1f, 1f));
+            }
+            else
+            {
+                currentPosition.z += Mathf.Sign(Random.Range(-1f, 1f));
+            }
+        }
+
+        Debug.Log($"MoveTowards: currentPosition={currentPosition}, target={target}, irregularity={irregularity}, expansionFactor={expansionFactor}");
+
+        // Asegurarse de que la posición no se mueva más allá del objetivo
+        currentPosition.x = Mathf.Clamp(currentPosition.x, Mathf.Min(currentPosition.x, target.x), Mathf.Max(currentPosition.x, target.x));
+        currentPosition.z = Mathf.Clamp(currentPosition.z, Mathf.Min(currentPosition.z, target.z), Mathf.Max(currentPosition.z, target.z));
 
         return currentPosition;
     }
@@ -70,12 +113,6 @@ public class PathGenerator : MonoBehaviour
             {
                 return false; // Ya existe un pathCube en esta posición
             }
-        }
-
-        // Verificar si se puede colocar el pathCube en la posición dada
-        if (!CanPlacePathCube(_position))
-        {
-            return false; // No se puede colocar el pathCube debido a cubos adyacentes
         }
 
         int chunkX = Mathf.FloorToInt(_position.x / chunkGenerator.chunkWidth);
@@ -114,7 +151,9 @@ public class PathGenerator : MonoBehaviour
 
             // Asegurarse de que el camino cubra al menos la mitad del chunk
             int steps = Mathf.FloorToInt(Mathf.Max(Mathf.CeilToInt(halfChunkWidth), Mathf.CeilToInt(halfChunkLength)));
-            Debug.Log(steps);
+
+            // Calcular la probabilidad de bifurcación basada en el número de chunks generados
+            float dynamicBranchingProbability = 1 - (1/(float)(i + 1));
 
             // Establecer la irregularidad a 0 para el primer chunk
             float currentIrregularity = (i == 0) ? 0 : irregularity;
@@ -123,14 +162,31 @@ public class PathGenerator : MonoBehaviour
             if(i == 0)
             {
                 currentPosition = chunkCenter;
-                CreatePathCube(currentPosition);
+                if(CanPlacePathCube(currentPosition))
+                {
+                    CreatePathCube(currentPosition);
+                }
             }
-
+            
             for (int step = 0; step < steps; step++)
             {
+
                 currentPosition = MoveTowards(currentPosition, chunkCenter, currentIrregularity, currentExpansionFactor);
-                CreatePathCube(currentPosition);
+                if (CanPlacePathCube(currentPosition))
+                {
+                    CreatePathCube(currentPosition);
+                }
             }
+
+                float random = Random.Range(0f, 1f);
+                // Intentar crear una bifurcación
+                Debug.Log(random + " < " + dynamicBranchingProbability);
+                if (random < dynamicBranchingProbability)
+                {
+                    Vector3 branchStartPosition = currentPosition;
+                    GenerateBranch(branchStartPosition, _currentChunk, i);
+                    Debug.Log("Branch created");
+                }
 
             // Moverse hacia un borde para conectar con el siguiente chunk
             Vector3 targetEdge = GetTargetEdge(currentPosition, _currentChunk, i);
@@ -138,7 +194,11 @@ public class PathGenerator : MonoBehaviour
             while (currentPosition != targetEdge)
             {
                 currentPosition = MoveTowards(currentPosition, targetEdge, currentIrregularity, currentExpansionFactor);
-                CreatePathCube(currentPosition);
+                
+                if(CanPlacePathCube(currentPosition))
+                {
+                    CreatePathCube(currentPosition);
+                }
             }
 
             // Almacenar el borde de entrada para el siguiente chunk
@@ -146,17 +206,89 @@ public class PathGenerator : MonoBehaviour
         }
     }
 
+    // Genera una bifurcación del camino
+    private void GenerateBranch(Vector3 startPosition, Vector3 currentChunk, int chunkIndex)
+    {
+        Vector3 branchPosition = startPosition;
+        Vector3 targetEdge = GetTargetEdgeBranch(branchPosition, currentChunk, chunkIndex);
+
+        Debug.Log("Branch target edge: " + targetEdge);
+        while (Vector3.Distance(branchPosition, targetEdge) > 0.1f)
+        {
+            branchPosition = MoveTowards(branchPosition, targetEdge, irregularity, expansionFactor);
+            if (CanPlacePathCube(branchPosition))
+            {
+                CreatePathCube(branchPosition);
+            }
+        }
+    }
+
+private Vector3 GetTargetEdgeBranch(Vector3 currentPosition, Vector3 chunkPosition, int chunkIndex)
+{
+    // Determine the main path direction
+    Vector3 nextChunkPosition = chunkGenerator.chunkPositions[(chunkIndex + 1) % chunkGenerator.chunkPositions.Count];
+    Vector3 directionToNextChunk = nextChunkPosition - chunkPosition;
+
+    List<Vector3> edgesForBranch = new List<Vector3>
+    {
+        new Vector3(chunkPosition.x + chunkGenerator.chunkWidth - 1, 0, currentPosition.z), // Borde derecho
+        new Vector3(chunkPosition.x, 0, currentPosition.z), // Borde izquierdo
+        new Vector3(currentPosition.x, 0, chunkPosition.z + chunkGenerator.chunkLength - 1), // Borde superior
+        new Vector3(currentPosition.x, 0, chunkPosition.z) // Borde inferior
+    };
+
+    // Excluir la dirección del camino principal
+    if (Mathf.Abs(directionToNextChunk.x) > Mathf.Abs(directionToNextChunk.z))
+    {
+        // Camino principal se mueve horizontalmente (derecha o izquierda)
+        if (directionToNextChunk.x > 0)
+        {
+            edgesForBranch.Remove(new Vector3(chunkPosition.x + chunkGenerator.chunkWidth - 1, 0, currentPosition.z)); // Borde derecho
+        }
+        else
+        {
+            edgesForBranch.Remove(new Vector3(chunkPosition.x, 0, currentPosition.z)); // Borde izquierdo
+        }
+    }
+    else
+    {
+        // Camino principal se mueve verticalmente (arriba o abajo)
+        if (directionToNextChunk.z > 0)
+        {
+            edgesForBranch.Remove(new Vector3(currentPosition.x, 0, chunkPosition.z + chunkGenerator.chunkLength - 1)); // Borde superior
+        }
+        else
+        {
+            edgesForBranch.Remove(new Vector3(currentPosition.x, 0, chunkPosition.z)); // Borde inferior
+        }
+    }
+
+    // Filtrar las posiciones que ya están ocupadas por cubos de camino
+    edgesForBranch = edgesForBranch.FindAll(edge => !pathCubesList.Exists(cube => cube.transform.position == edge));
+
+    if (edgesForBranch.Count == 0)
+    {
+        Debug.LogError("No hay bordes libres disponibles para la rama.");
+        return currentPosition; // Retornar la posición actual si no hay bordes libres
+    }
+
+    // Seleccionar un borde aleatorio de los restantes
+    Vector3 selectedEdge = edgesForBranch[Random.Range(0, edgesForBranch.Count)];
+
+    return selectedEdge;
+}
+
     // Obtiene el borde objetivo para conectar con el siguiente chunk
     private Vector3 GetTargetEdge(Vector3 currentPosition, Vector3 chunkPosition, int chunkIndex)
     {
         
         List<Vector3> edges = new List<Vector3>
-            {
-                new Vector3(chunkPosition.x + chunkGenerator.chunkWidth - 1, 0, currentPosition.z), // Borde derecho
-                new Vector3(chunkPosition.x, 0, currentPosition.z), // Borde izquierdo
-                new Vector3(currentPosition.x, 0, chunkPosition.z + chunkGenerator.chunkLength - 1), // Borde superior
-                new Vector3(currentPosition.x, 0, chunkPosition.z) // Borde inferior
-            };
+        {
+            new Vector3(chunkPosition.x + chunkGenerator.chunkWidth - 1, 0, currentPosition.z), // Borde derecho
+            new Vector3(chunkPosition.x, 0, currentPosition.z), // Borde izquierdo
+            new Vector3(currentPosition.x, 0, chunkPosition.z + chunkGenerator.chunkLength - 1), // Borde superior
+            new Vector3(currentPosition.x, 0, chunkPosition.z) // Borde inferior
+        };
 
         if (chunkGenerator.numberOfChunks == 1)
         {
@@ -179,11 +311,9 @@ public class PathGenerator : MonoBehaviour
                     minDistance = distance;
                 }
             }
-            Debug.Log("entryEdge: " + entryEdge);
-            Debug.Log("closestEdge: " + closestEdge);
+
             // Remover el borde más cercano al entryEdge
             edges.Remove(closestEdge);
-            Debug.Log(edges.Count);
             return edges[Random.Range(0, edges.Count)];
         }
         else
@@ -250,42 +380,3 @@ public class PathGenerator : MonoBehaviour
         irregularity = value;
     }
 }
-
-/*private Vector3 MoveTowards(Vector3 currentPosition, Vector3 target, float irregularity, float expansionFactor)
-    {
-        // Calcular la probabilidad de moverse en una dirección u otra
-        float moveProbability = Random.Range(0f, 1f);
-
-        // Si la irregularidad es 0, el camino será muy recto
-        // Si la irregularidad es 1, el camino será muy irregular
-            if (moveProbability < irregularity)
-            {
-                // Moverse en la dirección menos corta (más irregular)
-                if (Mathf.Abs(target.x - currentPosition.x) <= Mathf.Abs(target.z - currentPosition.z))
-                {
-                    currentPosition.x += Mathf.Sign(target.x - currentPosition.x);
-                }
-                else
-                {
-                    currentPosition.z += Mathf.Sign(target.z - currentPosition.z);
-                }
-            }
-            else
-            {
-                // Moverse en la dirección más corta (más regular)
-                if (Mathf.Abs(target.x - currentPosition.x) > Mathf.Abs(target.z - currentPosition.z))
-                {
-                    currentPosition.x += Mathf.Sign(target.x - currentPosition.x);
-                }
-                else
-                {
-                    currentPosition.z += Mathf.Sign(target.z - currentPosition.z);
-                }
-            }
-            Debug.Log(currentPosition);
-            // Asegurarse de que la posición no se mueva más allá del objetivo
-            currentPosition.x = Mathf.Clamp(currentPosition.x, Mathf.Min(currentPosition.x, target.x), Mathf.Max(currentPosition.x, target.x));
-            currentPosition.z = Mathf.Clamp(currentPosition.z, Mathf.Min(currentPosition.z, target.z), Mathf.Max(currentPosition.z, target.z));
-
-        return currentPosition;
-    }*/

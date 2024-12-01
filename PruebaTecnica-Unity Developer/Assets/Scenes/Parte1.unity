@@ -188,7 +188,7 @@ PrefabInstance:
       objectReference: {fileID: 1168309550}
     - target: {fileID: 4014705028869281592, guid: 9d3cbaa9964eb934db14811251305a06, type: 3}
       propertyPath: numberOfChunks
-      value: 4
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 6178947450928628764, guid: 9d3cbaa9964eb934db14811251305a06, type: 3}
       propertyPath: m_LocalPosition.x
